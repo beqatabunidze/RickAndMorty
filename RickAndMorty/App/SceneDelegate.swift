@@ -21,7 +21,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             fatalError("CharacterListViewController cannot be instantiated")
         }
         
-        let interactor = CharacterListInteractor()
+        let networkManager = NetworkManager()
+        let interactor = CharacterListInteractor(networkManager: networkManager)
         let presenter = CharacterListPresenter()
         
         characterListViewController.interactor = interactor
@@ -31,7 +32,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let navigation = UINavigationController(rootViewController: characterListViewController)
         window?.rootViewController = navigation
         window?.makeKeyAndVisible()
-        
     }
 }
 

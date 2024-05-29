@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -15,17 +16,85 @@
                     <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" keyboardDismissMode="onDrag" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="lCM-8Y-rOl">
+                                <rect key="frame" x="12" y="0.0" width="369" height="774"/>
+                                <color key="backgroundColor" name="primaryBackground"/>
+                                <searchBar key="tableHeaderView" contentMode="redraw" searchBarStyle="minimal" text="" id="Oii-X8-2sR">
+                                    <rect key="frame" x="0.0" y="0.0" width="369" height="56"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
+                                    <scopeButtonTitles>
+                                        <string>Title</string>
+                                        <string>Title</string>
+                                    </scopeButtonTitles>
+                                    <connections>
+                                        <outlet property="delegate" destination="Y6W-OH-hqX" id="xC9-eM-TOG"/>
+                                    </connections>
+                                </searchBar>
+                            </tableView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bXH-If-Qte">
+                                <rect key="frame" x="0.0" y="774" width="393" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="aHp-N4-z2V"/>
+                                </constraints>
+                                <items>
+                                    <barButtonItem title="Previous" image="chevron.backward" catalog="system" id="0Dz-Wk-ZTp">
+                                        <color key="tintColor" name="lightCyan"/>
+                                        <connections>
+                                            <action selector="onTapPrevious:" destination="Y6W-OH-hqX" id="tNx-Rs-ziB"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="s7E-dw-SF1"/>
+                                    <barButtonItem title="Next" image="chevron.right" catalog="system" id="wxu-tO-NC0">
+                                        <color key="tintColor" name="lightCyan"/>
+                                        <connections>
+                                            <action selector="onTapNext:" destination="Y6W-OH-hqX" id="ZOd-4D-jaz"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                                <color key="barTintColor" name="primaryBackground"/>
+                            </toolbar>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="tsV-BI-aPY">
+                                <rect key="frame" x="178" y="407.66666666666669" width="37" height="37"/>
+                                <color key="color" name="lightCyan"/>
+                            </activityIndicatorView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
-                        <color key="backgroundColor" name="characterPrimary"/>
+                        <color key="backgroundColor" name="primaryBackground"/>
+                        <constraints>
+                            <constraint firstItem="lCM-8Y-rOl" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="12" id="0Lh-d3-jYF"/>
+                            <constraint firstItem="lCM-8Y-rOl" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="BXG-tf-vbw"/>
+                            <constraint firstItem="bXH-If-Qte" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" id="BzE-In-JOY"/>
+                            <constraint firstItem="tsV-BI-aPY" firstAttribute="centerY" secondItem="5EZ-qb-Rvc" secondAttribute="centerY" id="DUz-bE-Vky"/>
+                            <constraint firstAttribute="bottom" secondItem="bXH-If-Qte" secondAttribute="bottom" constant="34" id="DiS-ij-fiG"/>
+                            <constraint firstItem="tsV-BI-aPY" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="IsM-DF-3C6"/>
+                            <constraint firstItem="bXH-If-Qte" firstAttribute="top" secondItem="lCM-8Y-rOl" secondAttribute="bottom" id="Wct-kb-O0F"/>
+                            <constraint firstItem="bXH-If-Qte" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="gJZ-Il-nRI"/>
+                            <constraint firstItem="lCM-8Y-rOl" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" constant="-12" id="nKw-f6-Xa4"/>
+                            <constraint firstItem="bXH-If-Qte" firstAttribute="top" secondItem="lCM-8Y-rOl" secondAttribute="bottom" id="vJp-1g-LUX"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="nextBarButton" destination="wxu-tO-NC0" id="kX9-Wg-x79"/>
+                        <outlet property="previousBarButton" destination="0Dz-Wk-ZTp" id="YLl-8V-KMt"/>
+                        <outlet property="searchBar" destination="Oii-X8-2sR" id="Ivi-i1-inj"/>
+                        <outlet property="spinner" destination="tsV-BI-aPY" id="7GF-8D-34v"/>
+                        <outlet property="tableView" destination="lCM-8Y-rOl" id="ghq-nt-8L1"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="130" y="-2"/>
+            <point key="canvasLocation" x="129.00763358778624" y="-2.1126760563380285"/>
         </scene>
     </scenes>
     <resources>
-        <namedColor name="characterPrimary">
+        <image name="chevron.backward" catalog="system" width="97" height="128"/>
+        <image name="chevron.right" catalog="system" width="97" height="128"/>
+        <namedColor name="lightCyan">
+            <color red="0.14509803921568629" green="0.66666666666666663" blue="0.88235294117647056" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="primaryBackground">
             <color red="0.9882352941176471" green="0.9882352941176471" blue="0.9882352941176471" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
