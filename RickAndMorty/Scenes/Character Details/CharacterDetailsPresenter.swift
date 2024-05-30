@@ -48,7 +48,7 @@ final class CharacterDetailsPresenter: CharacterDetailsPresenterProtocol {
             characterDetailsViewCntroller?.episodeCharacters = characters
             characterDetailsViewCntroller?.refreshData()
             characterDetailsViewCntroller?.stopActivityIndicator()
-        case .failure(let error):
+        case .failure:
             characterDetailsViewCntroller?.stopActivityIndicator()
         }
     }
