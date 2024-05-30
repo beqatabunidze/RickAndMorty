@@ -16,7 +16,8 @@ enum NetworkError: Error {
 
 protocol NetworkManagerProtocol {
     func get<T: Decodable>(endpoint: Endpoint, responseType: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void)
-    func get<T: Decodable>(url: URL, responseType: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void)
+    func getCombined<T: Decodable>(urlStrings: [String], responseType: T.Type, completion: @escaping (Result<[T], NetworkError>) -> Void)
+    func getCombinedCharacters<T: Decodable>(urlStrings: [String], responseType: T.Type, completion: @escaping (Result<[T], NetworkError>) -> Void)
 }
 
 class NetworkManager: NetworkManagerProtocol {
@@ -66,7 +67,7 @@ class NetworkManager: NetworkManagerProtocol {
         }.resume()
     }
     
-    func get<T: Decodable>(url: URL, responseType: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) {
+    private func get<T: Decodable>(url: URL, responseType: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
@@ -100,4 +101,69 @@ class NetworkManager: NetworkManagerProtocol {
             }
         }.resume()
     }
+    
+    func getCombined<T: Decodable>(urlStrings: [String], responseType: T.Type, completion: @escaping (Result<[T], NetworkError>) -> Void) {
+        let group = DispatchGroup()
+        var results: [T] = []
+        var encounteredError: NetworkError?
+        
+        for urlString in urlStrings {
+            guard let url = URL(string: urlString) else {
+                completion(.failure(.badURL))
+                return
+            }
+            
+            group.enter()
+            get(url: url, responseType: responseType) { result in
+                defer { group.leave() }
+                switch result {
+                case .success(let decodedResponse):
+                    results.append(decodedResponse)
+                case .failure(let error):
+                    encounteredError = error
+                }
+            }
+        }
+        
+        group.notify(queue: .main) {
+            if let error = encounteredError {
+                completion(.failure(error))
+            } else {
+                completion(.success(results))
+            }
+        }
+    }
+
+    func getCombinedCharacters<T: Decodable>(urlStrings: [String], responseType: T.Type, completion: @escaping (Result<[T], NetworkError>) -> Void) {
+        let group = DispatchGroup()
+        var episodeCharacters: [T] = []
+        var encounteredError: NetworkError?
+        
+        for urlString in urlStrings {
+            guard let url = URL(string: urlString) else {
+                completion(.failure(.badURL))
+                return
+            }
+            
+            group.enter()
+            get(url: url, responseType: responseType) { result in
+                defer { group.leave() }
+                switch result {
+                case .success(let decodedResponse):
+                    episodeCharacters.append(decodedResponse)
+                case .failure(let error):
+                    encounteredError = error
+                }
+            }
+        }
+        
+        group.notify(queue: .main) {
+            if let error = encounteredError {
+                completion(.failure(error))
+            } else {
+                completion(.success(episodeCharacters))
+            }
+        }
+    }
+
 }

@@ -12,12 +12,16 @@ protocol CharacterDetailsViewControllerProtocol {
     var episodeCharacters: [ResultModel] { get set }
     
     func setData(data: ResultModel)
+    func handleError(errorMessage: String)
+    func requestEpisodeFromUrl(urls: [String])
+    func requestCharactersFromEpisode(episodes: [Episode])
     func refreshData()
     func startActivityIndicator()
     func stopActivityIndicator()
 }
 
 final class CharacterDetailsViewController: UIViewController, CharacterDetailsViewControllerProtocol {
+
     //MARK: - Outlets
     @IBOutlet weak var characterImage: UIImageView!
     @IBOutlet weak var characterGender: UILabel!
@@ -38,7 +42,7 @@ final class CharacterDetailsViewController: UIViewController, CharacterDetailsVi
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        interactor?.requestCharacterData()
+        interactor?.requestData()
         setupTableView()
     }
     
@@ -51,13 +55,19 @@ final class CharacterDetailsViewController: UIViewController, CharacterDetailsVi
             self.characterOrigin.text = data.origin?.name
             
             self.title = data.name
-            
-            if let episodeUrl = data.episode {
-                self.interactor?.getEpisodes(with: episodeUrl)
-            }
-            
-            self.interactor?.getCharactersFromEpisode()
         }
+    }
+    
+    func requestCharactersFromEpisode(episodes: [Episode]) {
+        self.interactor?.getCharactersFromEpisode(episode: episodes)
+    }
+    
+    func requestEpisodeFromUrl(urls: [String]) {
+        interactor?.getEpisodes(with: urls)
+    }
+    
+    func handleError(errorMessage: String) {
+        presentAlert(title: "Error", message: errorMessage)
     }
     
     func refreshData() {
@@ -97,7 +107,11 @@ extension CharacterDetailsViewController: UITableViewDataSource {
         }
         
         cell.configure(episodeData: episodes[indexPath.row])
-        cell.configure(characterData: episodeCharacters)
+        
+        if !episodeCharacters.isEmpty {
+            cell.configure(characterData: episodeCharacters)
+        }
+        
         cell.collectionView.isHidden = indexPath.row != expandedIndex
         
         return cell

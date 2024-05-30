@@ -13,10 +13,23 @@ class CharacterListInteractorTests: XCTestCase {
     class MockNetworkManager: NetworkManagerProtocol {
         var getCharactersCalled = false
         var successResponse: Result<Character, NetworkError>?
+        var successEpisodeResponse: Result<[Episode], NetworkError>?
         
         func get<T: Decodable>(endpoint: Endpoint, responseType: T.Type, completion: @escaping (Result<T, NetworkError>) -> Void) {
             getCharactersCalled = true
             if let successResponse = successResponse as? Result<T, NetworkError> {
+                completion(successResponse)
+            }
+        }
+        
+        func getCombined<T>(urlStrings: [String], responseType: T.Type, completion: @escaping (Result<[T], RickAndMorty.NetworkError>) -> Void) where T : Decodable {
+            if let successResponse = successEpisodeResponse as? Result<[T], NetworkError> {
+                completion(successResponse)
+            }
+        }
+        
+        func getCombinedCharacters<T>(urlStrings: [String], responseType: T.Type, completion: @escaping (Result<[T], RickAndMorty.NetworkError>) -> Void) where T : Decodable {
+            if let successResponse = successEpisodeResponse as? Result<[T], NetworkError> {
                 completion(successResponse)
             }
         }

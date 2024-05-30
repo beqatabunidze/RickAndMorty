@@ -13,7 +13,7 @@ class EpisodeTableViewCell: UITableViewCell {
     @IBOutlet weak var episodeDateLabel: UILabel!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    private var character: [ResultModel] = []
+    private var characters: [ResultModel] = []
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -36,13 +36,12 @@ class EpisodeTableViewCell: UITableViewCell {
             self.episodeNameLabel.text = episodeData.name
             self.episodeSubtitleLabel.text = episodeData.episode
             self.episodeDateLabel.text = episodeData.airDate
-            
         }
     }
     
     func configure(characterData: [ResultModel]) {
         DispatchQueue.main.async {
-            self.character = characterData
+            self.characters = characterData
             self.collectionView.reloadData()
         }
     }
@@ -50,14 +49,15 @@ class EpisodeTableViewCell: UITableViewCell {
 
 extension EpisodeTableViewCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        character.count
+        characters.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EpisodeCollectionViewCell", for: indexPath) as? EpisodeCollectionViewCell else {
             fatalError("EpisodeCollectionViewCell cannot be dequeued")
         }
-        cell.configure(with: character[indexPath.item].image ?? "")
+        
+        cell.configure(with: characters[indexPath.item].image ?? "")
         
         return cell
     }
@@ -65,6 +65,33 @@ extension EpisodeTableViewCell: UICollectionViewDataSource {
 
 extension EpisodeTableViewCell: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let storyboard = UIStoryboard(name: "CharacterDetailsViewController", bundle: nil)
+        guard let characterDetailsVC = storyboard.instantiateViewController(withIdentifier: "CharacterDetailsViewController") as? CharacterDetailsViewController else {
+            fatalError("CharacterDetailsViewController cannot be instantiated")
+        }
+        
+        let characterData = characters[indexPath.item]
+        
+        let networkManager = NetworkManager()
+        let detailsPresenter = CharacterDetailsPresenter(data: characterData)
+        let detailsInteractor = CharacterDetailsInteractor(networkManager: networkManager)
+        
+        characterDetailsVC.interactor = detailsInteractor
+        detailsInteractor.presenter = detailsPresenter
+        detailsPresenter.characterDetailsViewCntroller = characterDetailsVC
+        
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            if let window = windowScene.windows.first,
+               let rootViewController = window.rootViewController {
+                if let navigationController = rootViewController.navigationController {
+                    navigationController.pushViewController(characterDetailsVC, animated: true)
+                } else {
+                    rootViewController.present(characterDetailsVC, animated: true, completion: nil)
+                }
+            } else {
+                fatalError("No window or root view controller found")
+            }
+        }
     }
 }
 

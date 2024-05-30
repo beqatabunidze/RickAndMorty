@@ -25,14 +25,14 @@ final class CharacterListInteractor: CharacterListInteractorProtocol {
     }
     
     func getAllCharacters(page: Int?) {
-        networkManager.get(endpoint: CharacterEndpoint.getAllCharacters(page: page), responseType: Character.self) { result in
-            self.presenter?.didFetchCharacterList(response: result)
+        networkManager.get(endpoint: CharacterEndpoint.getAllCharacters(page: page), responseType: Character.self) { [weak self] result in
+            self?.presenter?.didFetchCharacterList(response: result)
         }
     }
     
     func searchCharacterByName(name: String) {
-        networkManager.get(endpoint: CharacterEndpoint.searchCharacters(name: name), responseType: Character.self) { result in
-            self.presenter?.didSearchCharactersWithName(response: result)
+        networkManager.get(endpoint: CharacterEndpoint.searchCharacters(name: name), responseType: Character.self) { [weak self] result in
+            self?.presenter?.didSearchCharactersWithName(response: result)
         }
     }
     

@@ -10,9 +10,9 @@ import Foundation
 protocol CharacterDetailsPresenterProtocol {
     var characterDetailsViewCntroller: CharacterDetailsViewControllerProtocol? { get set }
     
-    func setData()
-    func didFetchEpisodeList(response: Result<Episode, NetworkError>)
-    func didFetchCharacterFromEpisode(response: Result<ResultModel, NetworkError>)
+    func populateData()
+    func didFetchEpisodeList(response: Result<[Episode], NetworkError>)
+    func didFetchCharacterFromEpisode(response: Result<[ResultModel], NetworkError>)
 }
 
 final class CharacterDetailsPresenter: CharacterDetailsPresenterProtocol {
@@ -25,35 +25,36 @@ final class CharacterDetailsPresenter: CharacterDetailsPresenterProtocol {
         self.data = data
     }
     
-    func didFetchEpisodeList(response: Result<Episode, NetworkError>) {
+    func didFetchEpisodeList(response: Result<[Episode], NetworkError>) {
         characterDetailsViewCntroller?.startActivityIndicator()
         
         switch response {
-        case .success(let episode):
-            characterDetailsViewCntroller?.episodes.append(episode)
+        case .success(let episodes):
+            characterDetailsViewCntroller?.episodes = episodes
+            characterDetailsViewCntroller?.requestCharactersFromEpisode(episodes: episodes)
+        case .failure(let error):
+            characterDetailsViewCntroller?.handleError(errorMessage: error.localizedDescription)
+            characterDetailsViewCntroller?.stopActivityIndicator()
+        }
+        characterDetailsViewCntroller?.stopActivityIndicator()
+        characterDetailsViewCntroller?.refreshData()
+    }
+    
+    func didFetchCharacterFromEpisode(response: Result<[ResultModel], NetworkError>) {
+        characterDetailsViewCntroller?.startActivityIndicator()
+        
+        switch response {
+        case .success(let characters):
+            characterDetailsViewCntroller?.episodeCharacters = characters
             characterDetailsViewCntroller?.refreshData()
             characterDetailsViewCntroller?.stopActivityIndicator()
-        case .failure(let failure):
-            print(failure.localizedDescription)
+        case .failure(let error):
             characterDetailsViewCntroller?.stopActivityIndicator()
         }
     }
     
-    func didFetchCharacterFromEpisode(response: Result<ResultModel, NetworkError>) {
-        characterDetailsViewCntroller?.startActivityIndicator()
-        
-        switch response {
-        case .success(let success):
-            characterDetailsViewCntroller?.episodeCharacters.append(success)
-            characterDetailsViewCntroller?.refreshData()
-            characterDetailsViewCntroller?.stopActivityIndicator()
-        case .failure(let failure):
-            print(failure.localizedDescription)
-            characterDetailsViewCntroller?.stopActivityIndicator()
-        }
-    }
-    
-    func setData() {
+    func populateData() {
+        characterDetailsViewCntroller?.requestEpisodeFromUrl(urls: data.episode ?? [])
         characterDetailsViewCntroller?.setData(data: data)
         characterDetailsViewCntroller?.refreshData()
     }
